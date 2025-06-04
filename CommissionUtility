@@ -1,0 +1,45 @@
+import java.util.ArrayList;
+
+public class CommissionUtility {
+
+    ArrayList<CommissionRecord> commissionList = new ArrayList<>();
+
+    public void addRecord(String name, double commission) {
+        commissionList.add(new CommissionRecord(name, commission));
+        System.out.println(" Added: " + name);
+    }
+
+    public void deleteRecord(String name) {
+        commissionList.removeIf(record -> record.employeeName.equals(name));
+        System.out.println(" Deleted: " + name);
+    }
+
+    public void displayRecords() {
+        System.out.println(" All Records:");
+        for (CommissionRecord record : commissionList) {
+            System.out.println(record);
+        }
+    }
+
+    public void searchRecord(String name) {
+        for (CommissionRecord record : commissionList) {
+            if (record.employeeName.equalsIgnoreCase(name)) {
+                System.out.println(" Found: " + record);
+                return;
+            }
+        }
+        System.out.println(" Not found: " + name);
+    }
+    public static void main(String[] args) {
+        CommissionUtility util = new CommissionUtility();
+
+        util.addRecord("Ali", 3200);
+        util.addRecord("Fatima", 4100);
+        util.addRecord("Omar", 2900);
+
+        util.displayRecords();
+        util.searchRecord("Fatima");
+        util.deleteRecord("Omar");
+        util.displayRecords();
+    }
+}
