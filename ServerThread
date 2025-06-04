@@ -1,0 +1,99 @@
+import java.io.*;
+import java.net.*;
+
+public class ServerThread extends Thread {
+
+    Socket clientSocket;
+
+    public ServerThread(Socket socket) {
+        this.clientSocket = socket;
+    }
+
+    @Override
+    public void run() {
+        try {
+            System.out.println("Client thread started.");
+
+            DataInputStream dis = new DataInputStream(clientSocket.getInputStream());
+            double individualSales = dis.readDouble();
+            double retentionScore = dis.readDouble();
+            double teamSales = dis.readDouble();
+
+            System.out.println("Received data from client: ");
+            System.out.println("Individual Sales: " + individualSales);
+            System.out.println("Retention Score: " + retentionScore);
+            System.out.println("Team Sales: " + teamSales);
+
+            //  Commission Rule Based on Scenario
+            double rate = 0;
+            double bonus = 0;
+
+            if (individualSales > 25000) {
+                rate = 12;
+                bonus = 300;
+            } else if (individualSales >= 15000) {
+                rate = 8;
+                bonus = 150;
+            } else {
+                rate = 5;
+                bonus = 0;
+            }
+
+            double commission = (individualSales * rate) / 100;
+            commission += bonus;
+            System.out.println("Base commission calculated: " + commission + " (Rate: " + rate + "% + Bonus: " + bonus + ")");
+
+            //  Retention Bonus
+            if (retentionScore > 80) {
+                commission += 200;
+                System.out.println("Retention bonus: 200 added.");
+            } else if (retentionScore >= 60) {
+                commission += 100;
+                System.out.println("Retention bonus: 100 added.");
+            } else {
+                System.out.println("No retention bonus awarded.");
+            }
+
+            //  Team Performance Scaling
+            if (teamSales > 200000) {
+                commission *= 1.1;
+                System.out.println("Team performance factor 1.1x applied.");
+            } else if (teamSales >= 100000) {
+                commission *= 1.05;
+                System.out.println("Team performance factor 1.05x applied.");
+            } else {
+                System.out.println("No team performance multiplier applied.");
+            }
+
+            //  Send commission to client
+            DataOutputStream dos = new DataOutputStream(clientSocket.getOutputStream());
+            dos.writeDouble(commission);
+            System.out.println(" Commission sent to client: " + commission + " OMR");
+
+            // Close resources
+            dis.close();
+            dos.close();
+            clientSocket.close();
+            System.out.println("Connection closed.\n");
+
+        } catch (Exception e) {
+            System.out.println(" Error: " + e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            ServerSocket server = new ServerSocket(6001);
+            System.out.println(" Server started. Waiting for clients...");
+
+            while (true) {
+                Socket socket = server.accept();
+                System.out.println(" Client connected.");
+                new ServerThread(socket).start();
+            }
+
+        } catch (IOException e) {
+            System.out.println("دServer error: " + e.getMessage());
+        }
+    }
+}
