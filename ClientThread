@@ -1,0 +1,46 @@
+import java.io.*;
+import java.net.*;
+import java.util.Scanner;
+
+public class ClientThread extends Thread {
+
+    @Override
+    public void run() {
+        try {
+            Socket socket = new Socket("localhost", 6001);
+
+            DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+            DataInputStream dis = new DataInputStream(socket.getInputStream());
+
+            Scanner input = new Scanner(System.in);
+
+            System.out.print("Enter individual sales revenue (OMR): ");
+            double individualSales = input.nextDouble();
+
+            System.out.print("Enter customer retention score (%): ");
+            double retentionScore = input.nextDouble();
+
+            System.out.print("Enter team sales revenue (OMR): ");
+            double teamSales = input.nextDouble();
+
+            dos.writeDouble(individualSales);
+            dos.writeDouble(retentionScore);
+            dos.writeDouble(teamSales);
+
+            double commission = dis.readDouble();
+
+            System.out.println("Calculated commission: " + commission + " OMR");
+
+            dis.close();
+            dos.close();
+            socket.close();
+
+        } catch (IOException e) {
+            System.out.println("Error connecting to server: " + e.getMessage());
+        }
+    }
+    public static void main(String[] args) {
+        ClientThread client = new ClientThread();
+        client.start();
+    }
+}
