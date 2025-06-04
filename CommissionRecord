@@ -1,0 +1,14 @@
+public class CommissionRecord {
+    String employeeName;
+    double commission;
+
+    public CommissionRecord(String name, double commission) {
+        this.employeeName = name;
+        this.commission = commission;
+    }
+
+    @Override
+    public String toString() {
+        return employeeName + ": " + commission + " OMR";
+    }
+}
